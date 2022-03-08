@@ -1,4 +1,4 @@
-module github.com/zhsj/wghttp
+module github.com/zeyugao/wghttp
 
 go 1.18
 
@@ -6,7 +6,10 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	golang.zx2c4.com/wireguard v0.0.0-20220318042302-193cf8d6a5d6
 	golang.zx2c4.com/wireguard/tun/netstack v0.0.0-20220318042302-193cf8d6a5d6
+	github.com/shadowsocks/go-shadowsocks2 v0.1.5
 )
+
+require github.com/riobard/go-bloom v0.0.0-20200614022211-cdc8013cb5b3 // indirect
 
 require (
 	github.com/google/btree v1.0.1 // indirect

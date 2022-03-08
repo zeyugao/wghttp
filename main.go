@@ -13,12 +13,14 @@ import (
 	"time"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/shadowsocks/go-shadowsocks2/core"
 	"golang.zx2c4.com/wireguard/device"
 	"golang.zx2c4.com/wireguard/tun/netstack"
 
-	"github.com/zhsj/wghttp/internal/third_party/tailscale/httpproxy"
-	"github.com/zhsj/wghttp/internal/third_party/tailscale/proxymux"
-	"github.com/zhsj/wghttp/internal/third_party/tailscale/socks5"
+	"github.com/zeyugao/wghttp/internal/third_party/goshadow"
+	"github.com/zeyugao/wghttp/internal/third_party/tailscale/httpproxy"
+	"github.com/zeyugao/wghttp/internal/third_party/tailscale/proxymux"
+	"github.com/zeyugao/wghttp/internal/third_party/tailscale/socks5"
 )
 
 //go:embed README.md
@@ -45,6 +47,10 @@ type options struct {
 	Listen   string `long:"listen" env:"LISTEN" default:"localhost:8080" description:"HTTP & SOCKS5 server address"`
 	ExitMode string `long:"exit-mode" env:"EXIT_MODE" choice:"remote" choice:"local" default:"remote" description:"Exit mode"`
 	Verbose  bool   `short:"v" long:"verbose" description:"Show verbose debug information"`
+
+	ShadowAddr string `long:"shadow-addr" default:"localhost:1080" description:"Listen addr for Shadowsocks"`
+	Cipher     string `long:"cipher" default:"AEAD_CHACHA20_POLY1305" description:"Cipher for Shadowsocks"`
+	Password   string `long:"password" description:"Password for Shadowsocks"`
 
 	ClientID string `long:"client-id" env:"CLIENT_ID" hidden:"true"`
 }
@@ -93,7 +99,7 @@ Description:`
 	httpProxy := &http.Server{Handler: statsHandler(httpproxy.Handler(dialer), dev)}
 	socksProxy := &socks5.Server{Dialer: dialer}
 
-	errc := make(chan error, 2)
+	errc := make(chan error, 4)
 	go func() {
 		if err := httpProxy.Serve(httpListener); err != nil {
 			logger.Errorf("Serving http proxy: %v", err)
@@ -106,6 +112,31 @@ Description:`
 			errc <- err
 		}
 	}()
+
+	addr := opts.ShadowAddr
+	password := opts.Password
+	cipher := opts.Cipher
+	if password != "" && cipher != "" {
+		var key []byte
+
+		ciph, err := core.PickCipher(cipher, key, password)
+
+		if err != nil {
+			errc <- err
+		}
+
+		go func() {
+			if err := goshadow.TcpRemote(addr, ciph.StreamConn, tnet); err != nil {
+				errc <- err
+			}
+		}()
+		// go func() {
+		// 	if err := goshadow.UdpRemote(addr, ciph.PacketConn, tnet); err != nil {
+		// 		errc <- err
+		// 	}
+		// }()
+	}
+
 	<-errc
 	os.Exit(1)
 }
