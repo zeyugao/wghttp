@@ -15,7 +15,7 @@ import (
 )
 
 // Listen on addr for incoming connections.
-func TcpRemote(addr string, shadow func(net.Conn) net.Conn, tnet *netstack.Net) (err error) {
+func TcpRemote(addr string, shadow func(net.Conn) net.Conn, tnet *netstack.Net, TCPCork bool) (err error) {
 	l, err := net.Listen("tcp", addr)
 	if err != nil {
 		logf("failed to listen on %s: %v", addr, err)

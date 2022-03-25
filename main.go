@@ -51,6 +51,7 @@ type options struct {
 	ShadowAddr string `long:"shadow-addr" default:"localhost:1080" description:"Listen addr for Shadowsocks"`
 	Cipher     string `long:"cipher" default:"AEAD_CHACHA20_POLY1305" description:"Cipher for Shadowsocks"`
 	Password   string `long:"password" description:"Password for Shadowsocks"`
+	TCPCork    bool   `long:"tcp-cork" description:"Enable TCP Cork in Shadowsocks"`
 
 	ClientID string `long:"client-id" env:"CLIENT_ID" hidden:"true"`
 }
@@ -126,7 +127,7 @@ Description:`
 		}
 
 		go func() {
-			if err := goshadow.TcpRemote(addr, ciph.StreamConn, tnet); err != nil {
+			if err := goshadow.TcpRemote(addr, ciph.StreamConn, tnet, opts.TCPCork); err != nil {
 				errc <- err
 			}
 		}()
