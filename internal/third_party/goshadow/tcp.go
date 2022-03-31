@@ -56,7 +56,7 @@ func TcpRemote(addr string, shadow func(net.Conn) net.Conn, tnet *netstack.Net, 
 			}
 			defer rc.Close()
 
-			logf("proxy %s <-> %s", c.RemoteAddr(), tgt)
+			// logf("proxy %s <-> %s", c.RemoteAddr(), tgt)
 			if err = relay(sc, rc); err != nil {
 				logf("relay error: %v", err)
 			}
