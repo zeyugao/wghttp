@@ -203,14 +203,30 @@ func (c *Conn) handleRequest() error {
 
 	errc := make(chan error, 2)
 	go func() {
-		_, err := io.Copy(c.clientConn, srv)
+		var err error
+		for i := 1; i < 5; i++ {
+			_, err = io.Copy(c.clientConn, srv)
+			if err == nil {
+				break
+			} else {
+				log.Printf("from backend to client: %v, retry %d", err, i)
+			}
+		}
 		if err != nil {
 			err = fmt.Errorf("from backend to client: %w", err)
 		}
 		errc <- err
 	}()
 	go func() {
-		_, err := io.Copy(srv, c.clientConn)
+		var err error
+		for i := 1; i < 5; i++ {
+			_, err = io.Copy(srv, c.clientConn)
+			if err == nil {
+				break
+			} else {
+				log.Printf("from backend to client: %v, retry %d", err, i)
+			}
+		}
 		if err != nil {
 			err = fmt.Errorf("from client to backend: %w", err)
 		}
