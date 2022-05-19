@@ -131,11 +131,11 @@ Description:`
 				errc <- err
 			}
 		}()
-		// go func() {
-		// 	if err := goshadow.UdpRemote(addr, ciph.PacketConn, tnet); err != nil {
-		// 		errc <- err
-		// 	}
-		// }()
+		go func() {
+			if err := goshadow.UdpRemote(addr, ciph.PacketConn, tnet); err != nil {
+				errc <- err
+			}
+		}()
 	}
 
 	<-errc

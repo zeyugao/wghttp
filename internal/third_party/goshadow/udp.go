@@ -56,7 +56,12 @@ func UdpRemote(addr string, shadow func(net.PacketConn) net.PacketConn, tnet *ne
 
 		pc := nm.Get(raddr.String())
 		if pc == nil {
-			pc, err = net.ListenPacket("udp", "")
+			addr := net.UDPAddr{
+				Port: 0,
+				IP:   net.ParseIP("0.0.0.0"),
+			}
+
+			pc, err = tnet.ListenUDP(&addr)
 			if err != nil {
 				logf("UDP remote listen error: %v", err)
 				continue
