@@ -4,8 +4,8 @@ go 1.18
 
 require (
 	github.com/jessevdk/go-flags v1.5.0
-	golang.zx2c4.com/wireguard v0.0.0-20220318042302-193cf8d6a5d6
-	golang.zx2c4.com/wireguard/tun/netstack v0.0.0-20220318042302-193cf8d6a5d6
+	golang.zx2c4.com/wireguard v0.0.0-20220407013110-ef5c587f782d
+	golang.zx2c4.com/wireguard/tun/netstack v0.0.0-20220407013110-ef5c587f782d
 	github.com/shadowsocks/go-shadowsocks2 v0.1.5
 )
 
